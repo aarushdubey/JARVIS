@@ -1,0 +1,10 @@
+# requirements.txt
+google-generativeai
+Pillow
+requests
+geocoder
+openai-whisper
+numpy
+scipy
+Flask  # <-- You'll add a web framework
+gunicorn # <-- Web server for Render    

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jarvis Web</title>
+    <style>
+        body { font-family: sans-serif; background-color: #121212; color: #e0e0e0; }
+        #chatbox { width: 90%; max-width: 600px; margin: auto; border: 1px solid #333; padding: 10px; height: 70vh; overflow-y: scroll; }
+        #userInput { width: 80%; padding: 10px; }
+        button { padding: 10px; }
+    </style>
+</head>
+<body>
+    <div id="chatbox"><div>Welcome to Jarvis!</div></div>
+    <input type="text" id="userInput" placeholder="Ask Jarvis...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const chatbox = document.getElementById('chatbox');
+        const userInput = document.getElementById('userInput');
+
+        async function sendMessage() {
+            const message = userInput.value;
+            if (!message) return;
+
+            // Display user message
+            chatbox.innerHTML += `<div><b>You:</b> ${message}</div>`;
+            userInput.value = '';
+
+            // Send message to backend API
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            });
+
+            const data = await response.json();
+            
+            // Display Jarvis's reply
+            chatbox.innerHTML += `<div><b>Jarvis:</b> ${data.reply || data.error}</div>`;
+            chatbox.scrollTop = chatbox.scrollHeight; // Scroll to bottom
+        }
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
