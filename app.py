@@ -71,6 +71,14 @@ class Memory:
             role = 'model' if item.get('role') == 'assistant' else 'user'
             messages.append({"role": role, "parts": [item.get('content', '')]})
         return messages
+    def get_gemini_history(self):
+        """Converts local history to Gemini's format."""
+        gemini_history = []
+        for item in self.conversation_history[-10:]: # Limit history size
+            # Gemini uses 'model' for the assistant role
+            role = 'model' if item.get('role') == 'assistant' else 'user'
+            gemini_history.append({'role': role, 'parts': [item.get('content', '')]})
+        return gemini_history
 
 # --- Flask App and Memory Initialization ---
 app = Flask(__name__, template_folder='templates')
