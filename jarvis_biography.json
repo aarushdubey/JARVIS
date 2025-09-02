@@ -1,0 +1,261 @@
+{
+  "personal_info": {
+    "name": "Aarush Dubey",
+    "date_of_birth": "2004-09-11",
+    "location": {
+      "city": "Amaravati",
+      "state": "Andhra Pradesh",
+      "country": "India"
+    },
+    "timezone": "+05:30"
+  },
+  "technical_profile": {
+    "hardware": {
+      "computer_model": "MacBook Air",
+      "architecture": "Apple Silicon (osx-arm64)"
+    },
+    "software": {
+      "operating_system": "macOS",
+      "primary_editor": "Visual Studio Code",
+      "shell": "Zsh"
+    }
+  },
+  "education": {
+    "current_year": "2nd year B.Tech",
+    "first_year_experience": {
+      "languages": [
+        "C",
+        "Data Structures"
+      ]
+    },
+    "specialization_interest": "Not explicitly stated, but considered C++ and other options",
+    "exam_preparation": {
+      "subjects": [
+        "Data Structures",
+        "Algorithms",
+        "Graphs",
+        "Trees",
+        "Arrays",
+        "Stacks",
+        "Queues",
+        "Searching",
+        "Sorting"
+      ],
+      "important_dates": {
+        "data_structures_exam": "2025-05-16"
+      },
+      "reference_material": [
+        "May 2024 SRM University Data Structures question paper"
+      ]
+    },
+    "unit_focus": [
+      {
+        "unit": "AC Circuits",
+        "topics": [
+          "AC voltage generation",
+          "Phasor analysis",
+          "Resonance",
+          "Power in AC circuits",
+          "Numerical problems"
+        ]
+      },
+      {
+        "unit": "Trees",
+        "topics": [
+          "Tree terminology",
+          "Binary trees",
+          "BSTs",
+          "Tree traversals",
+          "AVL trees",
+          "Expression trees"
+        ]
+      }
+    ]
+  },
+  "projects": [
+    {
+      "name": "Jarvis Voice/Text Assistant",
+      "details": {
+        "languages": [
+          "Python"
+        ],
+        "key_features": [
+          "Full GUI with animated visuals and chat history",
+          "Advanced voice recognition via local Whisper model",
+          "Text input mode",
+          "Long-term memory for facts and conversations (JSON files)",
+          "Instant replies from a local knowledge base and Q&A cache",
+          "Hard-coded commands for weather, Bluetooth, web search, opening/closing apps, and opening websites"
+        ],
+        "development_evolution": [
+          "Started as a command-line script",
+          "Migrated from inefficient subprocess to a fast Ollama REST API model",
+          "Overcame PyAudio installation issues by switching to a robust Whisper/sounddevice stack",
+          "Evolved from a terminal interface to a full Tkinter-based GUI"
+        ]
+      }
+    },
+    {
+      "name": "JavaCoding App",
+      "details": {
+        "type": "Custom Android messaging app",
+        "stack": [
+          "Android Studio",
+          "Kotlin DSL",
+          "Firebase",
+          "Supabase"
+        ],
+        "features": [
+          "Login/Signup",
+          "Public & Private Chat",
+          "Instagram DM-like layout",
+          "Persistent chat history (Firestore)",
+          "Push notifications (Firebase Messaging)",
+          "Media sharing (Supabase)"
+        ]
+      }
+    },
+    {
+      "name": "Smart City App",
+      "details": {
+        "goal": "Real-time city insights for Bengaluru",
+        "stack": [
+          "Gemini",
+          "Firebase Studio",
+          "Google AI"
+        ],
+        "features": [
+          "Predictive alerts",
+          "Map-based dashboard",
+          "Social media integration"
+        ]
+      }
+    },
+    {
+      "name": "Project Kisan",
+      "details": {
+        "goal": "AI assistant for rural farmers",
+        "stack": [
+          "Gemini (Vertex AI)",
+          "Firebase Studio",
+          "Google AI"
+        ],
+        "features": [
+          "Crop disease diagnosis from images",
+          "Real-time market price analysis",
+          "Voice-first interaction"
+        ]
+      }
+    },
+    {
+      "name": "Resume Enhancer",
+      "details": {
+        "tech": [
+          "Ollama",
+          "llama3:8b"
+        ],
+        "goal": "Extract data from resumes and generate in a fixed template",
+        "additional_features": [
+          "Recommend courses from CSV based on job profile"
+        ]
+      }
+    },
+    {
+      "name": "Research Project",
+      "details": {
+        "dataset": [
+          "200 Indian English fiction books",
+          "World cities dataset",
+          "Indian cities dataset"
+        ],
+        "goal": "Extract and track geographic locations mentioned in stories"
+      }
+    }
+  ],
+  "skills_and_interests": {
+    "programming_languages": [
+      "Python",
+      "Kotlin",
+      "C",
+      "C++"
+    ],
+    "tools": [
+      "Android Studio",
+      "Firebase",
+      "Supabase",
+      "Vertex AI",
+      "Ollama",
+      "Conda",
+      "Git",
+      "Homebrew"
+    ],
+    "key_python_libraries": [
+      "Tkinter",
+      "openai-whisper",
+      "sounddevice",
+      "pyttsx3",
+      "requests",
+      "Pillow",
+      "geocoder"
+    ],
+    "areas_of_interest": [
+      "AI-powered applications",
+      "Data extraction",
+      "Natural language processing",
+      "Geographic data analysis"
+    ],
+    "gaming": [
+      "SimCity BuildIt (optimized city layouts)"
+    ]
+  },
+  "preferences": {
+    "learning_style": "Step-by-step guidance with explanations and code",
+    "ui_design": [
+      "Prefers visual feedback",
+      "Animated elements",
+      "Semi-transparent backgrounds"
+    ],
+    "event_organization": "Weekly events schedule for Smart Tech Club until May 2026"
+  },
+  "miscellaneous": {
+    "watch": {
+      "type": "Automatic analog (Citizen Tusyusa, first copy)",
+      "observations": [
+        "Stops after a few hours if not worn",
+        "Manual winding required"
+      ]
+    },
+    "budget": {
+      "laptop_purchase": "1.5 lakhs"
+    }
+  },
+  "my dog's name": "tiger",
+  "my": {
+    "dad's": {
+      "name": "Pankaj"
+    },
+    "laptop": "Macbook Air M1",
+    "srm": {
+      "wifi": {
+        "password": "#VG576nc"
+      }
+    },
+    "current": {
+      "cgpa": "8.87"
+    },
+    "branch": {
+      "in": {
+        "btech": "computer science"
+      }
+    },
+    "phone": "S24 ultra",
+    "dog's": {
+      "name": "Tiger"
+    },
+    "club": "Smart Tech",
+    "friend": "shweta"
+  },
+  "pradyun": "friend",
+  "luck": "friend",
+  "shivika": "girlfriend"
+}

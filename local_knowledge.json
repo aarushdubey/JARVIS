@@ -1,0 +1,17 @@
+{
+  "how are you": "I am functioning within normal parameters. How may I help you?",
+  "who are you": "I am Jarvis, a voice-activated assistant designed to help you with your tasks.",
+  "what is your purpose": "My purpose is to assist you by executing commands and providing information as efficiently as possible.",
+  "what time is it": "get_time",
+  "what is today's date": "get_date",
+  "what is my name": "sir, your name is Aarush Dubey",
+  "what is my dog's name": "certainly sir , your dog is Mr. Tiger",
+  "who is lucky?":"Sir, lucky is your friend from your class",
+  "and mand ka tola":"Sir, Jo na naache ,behen ka loda",
+  "teri maa ki chut":"teri maa ka lunnd hai kya?",
+  "bhosdi ke":"tu bhhosdi ka , tera baap bhhosdi ka , teri maa bhhosdi ki",
+  "how is my college?":"randi ka college hai , behen chodd , teachers bhi randi k hai aur management bhi",
+  "i am your father":"tera baap hu bhosdi ke, jarvis dubey",
+  "who is your father?":"tum sab ka baap , aarush dubey , the great",
+  "fuck you":"nenu , ninnu, denguta"
+}
