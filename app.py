@@ -126,7 +126,7 @@ class Memory:
         return final_context
 
 # --- Flask App and Memory Initialization ---
-app = Flask(__name__, template_folder='templates')
+app = Flask(__name__, template_folder='templates', static_folder='static')
 memory = Memory()
 
 # --- Gemini Model Initialization ---

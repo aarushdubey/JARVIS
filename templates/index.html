@@ -2,48 +2,151 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Jarvis Web</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jarvis AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; background-color: #121212; color: #e0e0e0; }
-        #chatbox { width: 90%; max-width: 600px; margin: auto; border: 1px solid #333; padding: 10px; height: 70vh; overflow-y: scroll; }
-        #userInput { width: 80%; padding: 10px; }
-        button { padding: 10px; }
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: #0a0a1a;
+        }
+        /* Custom scrollbar for a more futuristic look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00aaff;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0077cc;
+        }
+        .glow {
+            box-shadow: 0 0 5px #00aaff, 0 0 10px #00aaff, 0 0 15px #00aaff, 0 0 20px #00aaff;
+        }
+        .chat-bubble-user {
+            background-color: #1a1a2e;
+            border-left: 3px solid #00aaff;
+        }
+        .chat-bubble-bot {
+            background-color: #1e1e3f;
+            border-right: 3px solid #00ddff;
+        }
     </style>
 </head>
-<body>
-    <div id="chatbox"><div>Welcome to Jarvis!</div></div>
-    <input type="text" id="userInput" placeholder="Ask Jarvis...">
-    <button onclick="sendMessage()">Send</button>
+<body class="text-blue-100 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-3xl h-full flex flex-col">
+        
+        <div class="w-full flex justify-center items-center my-4 md:my-8">
+            <img src="/static/jarvis_logo.gif" alt="Jarvis Visualizer" class="w-full max-w-md h-auto object-contain rounded-lg">
+        </div>
+
+        <div id="chat-window" class="flex-grow w-full bg-black bg-opacity-50 border-2 border-blue-900 rounded-xl p-4 overflow-y-auto mb-4" style="height: 40vh;">
+            <div class="chat-bubble-bot p-3 rounded-lg mb-2 max-w-lg">
+                <p class="font-bold text-cyan-300">Jarvis</p>
+                <p class="text-sm">Greetings. I am Jarvis. How may I assist you?</p>
+            </div>
+        </div>
+
+        <form id="chat-form" class="w-full flex items-center space-x-2">
+            <input type="text" id="message-input" placeholder="Enter your command..." autocomplete="off"
+                   class="flex-grow bg-gray-900 border-2 border-blue-800 focus:border-cyan-400 focus:ring-0 text-white rounded-full py-3 px-5 transition-all duration-300 outline-none">
+            <button type="submit" class="bg-blue-600 hover:bg-cyan-500 text-white rounded-full p-3 glow transition-all duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                </svg>
+            </button>
+        </form>
+    </div>
 
     <script>
-        const chatbox = document.getElementById('chatbox');
-        const userInput = document.getElementById('userInput');
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
+        const chatWindow = document.getElementById('chat-window');
 
-        async function sendMessage() {
-            const message = userInput.value;
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = messageInput.value.trim();
             if (!message) return;
 
-            // Display user message
-            chatbox.innerHTML += `<div><b>You:</b> ${message}</div>`;
-            userInput.value = '';
+            // Clear input and display user message
+            messageInput.value = '';
+            appendMessage('user', message);
 
-            // Send message to backend API
-            const response = await fetch('/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: message })
-            });
+            // Show thinking indicator
+            const thinkingIndicator = appendMessage('bot', '...', true);
 
-            const data = await response.json();
+            try {
+                // Send message to backend
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Update bot message with actual reply
+                updateBotMessage(thinkingIndicator, data.reply);
+
+            } catch (error) {
+                console.error('Error:', error);
+                updateBotMessage(thinkingIndicator, 'My apologies, I seem to be having trouble connecting to my core functions.');
+            }
+        });
+
+        function appendMessage(role, text, isThinking = false) {
+            const bubble = document.createElement('div');
+            const author = document.createElement('p');
+            const content = document.createElement('p');
+
+            author.className = 'font-bold';
+            content.className = 'text-sm';
+            content.textContent = text;
+
+            if (role === 'user') {
+                bubble.className = 'chat-bubble-user p-3 rounded-lg mb-2 max-w-lg ml-auto text-right';
+                author.className += ' text-blue-300';
+                author.textContent = 'You';
+            } else {
+                bubble.className = 'chat-bubble-bot p-3 rounded-lg mb-2 max-w-lg';
+                author.className += ' text-cyan-300';
+                author.textContent = 'Jarvis';
+            }
             
-            // Display Jarvis's reply
-            chatbox.innerHTML += `<div><b>Jarvis:</b> ${data.reply || data.error}</div>`;
-            chatbox.scrollTop = chatbox.scrollHeight; // Scroll to bottom
+            if (isThinking) {
+                content.innerHTML = '<span class="animate-pulse">Thinking...</span>';
+            }
+
+            bubble.appendChild(author);
+            bubble.appendChild(content);
+            chatWindow.appendChild(bubble);
+
+            // Scroll to the bottom
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            return bubble; // Return the bubble element to update it later
         }
 
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
+        function updateBotMessage(bubbleElement, newText) {
+            // The content is the second child <p> tag
+            const contentElement = bubbleElement.children[1];
+            if(contentElement) {
+                contentElement.innerHTML = ''; // Clear the "Thinking..." animation
+                contentElement.textContent = newText;
+            }
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
     </script>
 </body>
 </html>
