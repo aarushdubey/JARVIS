@@ -159,6 +159,7 @@ def fetch_weather():
     return "Sorry, I couldn't detect the location."
 
 # --- Main API Endpoints ---
+# --- Main API Endpoints ---
 @app.route('/')
 def serve_index():
     return render_template('index.html')
@@ -173,7 +174,6 @@ def chat():
     cmd_lower = user_command.lower()
     response_text = None
 
-    # PRIORITY 1: Instant replies from knowledge or cache
     if cmd_lower in memory.local_knowledge:
         response_text = memory.local_knowledge[cmd_lower]
         if response_text == "get_time": response_text = f"The time is {datetime.datetime.now().strftime('%I:%M %p')}."
@@ -181,39 +181,32 @@ def chat():
     elif cmd_lower in memory.qa_cache:
         response_text = memory.qa_cache[cmd_lower]
 
-    # PRIORITY 2: Hard-coded web commands
     if response_text is None:
         if "weather" in cmd_lower:
             response_text = fetch_weather()
         elif cmd_lower.startswith("search for"):
             query = user_command[len("search for"):].strip()
-            # Basic URL encoding for the query
-            from urllib.parse import quote_plus
             search_url = f"https://www.google.com/search?q={quote_plus(query)}"
             response_text = f"Here is a search link for '{query}': {search_url}"
     
-    # PRIORITY 3: Fallback to Gemini API with RAG context
     if response_text is None:
         if not model:
+            print("DEBUG: AI model is NOT initialized.") # Added debug
             response_text = "The AI model is not initialized. Please check the server logs."
         else:
             try:
-                # Get the rich, relevant context for this specific command
                 messages = memory.get_context(user_command)
-                # Pass the history directly to the generate_content method
+                print(f"DEBUG: Messages sent to Gemini: {messages}") # Added debug
                 response = model.generate_content(messages)
                 response_text = response.text.strip()
+                print(f"DEBUG: Gemini response received: {response_text}") # Added debug
             except Exception as e:
-                print(f"Error communicating with Gemini API: {e}")
+                print(f"ERROR: Error communicating with Gemini API: {e}") # Enhanced error logging
                 response_text = "I'm sorry, I encountered an error with the AI."
     
     memory.add_to_history("model", response_text)
     return jsonify({"reply": response_text})
 
 if __name__ == '__main__':
-    # Use environment variable for port, defaulting to 5000 for local dev
     port = int(os.environ.get('PORT', 5000))
-    # For production, use a proper WSGI server like Gunicorn, not app.run()
-    # Gunicorn will be specified in your Render start command (e.g., gunicorn app:app)
-    # The debug=True flag should be False in production
     app.run(host='0.0.0.0', port=port)
