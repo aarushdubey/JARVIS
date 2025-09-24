@@ -1,4 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- INTRO SEQUENCE LOGIC ---
+    const introOverlay = document.getElementById('intro-overlay');
+    const introSound = document.getElementById('intro-sound');
+
+    // Attempt to play the sound automatically
+    introSound.play().catch(error => {
+        // This catch block handles browser autoplay restrictions.
+        // On many browsers, audio can't play until the user clicks somewhere.
+        console.warn("Audio autoplay was blocked. It will start after the first user interaction.", error);
+        // We add a listener to play the sound on the first click if autoplay fails.
+        document.body.addEventListener('click', () => introSound.play(), { once: true });
+    });
+
+    // Listen for when the sound has finished playing
+    introSound.addEventListener('ended', () => {
+        // Add the 'hidden' class to fade out the overlay
+        introOverlay.classList.add('hidden');
+    });
+    
+    // --- CHAT LOGIC ---
     const chatBox = document.getElementById('chat-box');
     const userInput = document.getElementById('user-input');
     const sendBtn = document.getElementById('send-btn');
