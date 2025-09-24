@@ -8,14 +8,14 @@ body {
     align-items: center;
     height: 100vh;
     overflow: hidden;
-    /* 1. Set the background GIF */
-    background-image: url('jarvis_logo.gif'); /* <-- YOUR GIF NAME HERE */
+    /* This is the final background that appears after the intro */
+    background-image: url('background.gif');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-/* 2. Create the semi-transparent overlay */
+/* This is the semi-transparent overlay on top of the final background */
 body::before {
     content: '';
     position: absolute;
@@ -24,8 +24,31 @@ body::before {
     right: 0;
     bottom: 0;
     background-color: rgba(0, 10, 25, 0.75); /* Dark blue overlay with 75% opacity */
-    z-index: -1; /* Place it behind the content */
+    z-index: -1; /* Place it behind the chat content */
 }
+
+/* --- Intro Overlay Styling --- */
+#intro-overlay {
+    position: fixed; /* Cover the entire screen */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('background.gif'); /* Use the same GIF */
+    background-size: cover;
+    background-position: center;
+    z-index: 1000; /* Ensure it's on top of everything */
+    opacity: 1; /* Start fully visible */
+    visibility: visible;
+    transition: opacity 1.5s ease-out, visibility 1.5s ease-out; /* Smooth fade effect */
+}
+
+/* Helper class to hide the intro overlay */
+#intro-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
 
 /* --- Chat Interface Styling --- */
 .chat-container {
@@ -65,16 +88,9 @@ body::before {
 }
 
 /* Scrollbar styling */
-.chat-box::-webkit-scrollbar {
-    width: 8px;
-}
-.chat-box::-webkit-scrollbar-thumb {
-    background: rgba(0, 191, 255, 0.5);
-    border-radius: 4px;
-}
-.chat-box::-webkit-scrollbar-track {
-    background: transparent;
-}
+.chat-box::-webkit-scrollbar { width: 8px; }
+.chat-box::-webkit-scrollbar-thumb { background: rgba(0, 191, 255, 0.5); border-radius: 4px; }
+.chat-box::-webkit-scrollbar-track { background: transparent; }
 
 .message {
     max-width: 75%;
