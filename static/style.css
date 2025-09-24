@@ -1,0 +1,136 @@
+/* --- General Body and Background Styling --- */
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    /* 1. Set the background GIF */
+    background-image: url('jarvis_logo.gif'); /* <-- YOUR GIF NAME HERE */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* 2. Create the semi-transparent overlay */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 10, 25, 0.75); /* Dark blue overlay with 75% opacity */
+    z-index: -1; /* Place it behind the content */
+}
+
+/* --- Chat Interface Styling --- */
+.chat-container {
+    width: 90%;
+    max-width: 800px;
+    height: 90vh;
+    background-color: rgba(10, 25, 41, 0.85); /* Slightly transparent chat background */
+    border: 1px solid rgba(0, 191, 255, 0.4);
+    border-radius: 15px;
+    box-shadow: 0 0 25px rgba(0, 191, 255, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.header {
+    background-color: rgba(0, 191, 255, 0.1);
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid rgba(0, 191, 255, 0.4);
+}
+
+.header h1 {
+    margin: 0;
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: #00bfff; /* Deep Sky Blue */
+}
+
+.chat-box {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Scrollbar styling */
+.chat-box::-webkit-scrollbar {
+    width: 8px;
+}
+.chat-box::-webkit-scrollbar-thumb {
+    background: rgba(0, 191, 255, 0.5);
+    border-radius: 4px;
+}
+.chat-box::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.message {
+    max-width: 75%;
+    padding: 10px 15px;
+    border-radius: 20px;
+    line-height: 1.5;
+}
+
+.user-message {
+    background-color: #007bff;
+    align-self: flex-end;
+    border-bottom-right-radius: 5px;
+}
+
+.jarvis-message {
+    background-color: rgba(44, 62, 80, 0.8);
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
+}
+
+.chat-input-area {
+    display: flex;
+    padding: 15px;
+    border-top: 1px solid rgba(0, 191, 255, 0.4);
+    background-color: rgba(10, 25, 41, 0.9);
+}
+
+#user-input {
+    flex-grow: 1;
+    padding: 12px;
+    border: 1px solid rgba(0, 191, 255, 0.5);
+    border-radius: 25px;
+    background-color: #1c2b3a;
+    color: #f0f0f0;
+    font-size: 16px;
+    outline: none;
+}
+
+#user-input:focus {
+    border-color: #00bfff;
+    box-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
+}
+
+#send-btn {
+    margin-left: 10px;
+    padding: 0 25px;
+    border: none;
+    background-color: #00bfff;
+    color: white;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+#send-btn:hover {
+    background-color: #009acd;
+}
