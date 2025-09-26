@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template
 import google.generativeai as genai
+from google.generativeai.types import HarmCategory, HarmBlockThreshold
 import os
 import json
 import datetime
@@ -80,8 +81,7 @@ class Memory:
 
     def find_relevant_knowledge(self, query, top_k=3):
         query_words = set(query.lower().split())
-        if not query_words:
-            return []
+        if not query_words: return []
         
         scored_knowledge = []
         for snippet in self.unified_knowledge:
@@ -122,13 +122,14 @@ memory = Memory()
 
 # --- Gemini Model Initialization ---
 try:
-    # --- API KEY IS NOW HARD-CODED AS REQUESTED ---
-    # WARNING: This is insecure. Avoid putting secret keys in your code.
-    api_key = "AIzaSyACX3zMiPVbKlhkNxDhNTkoaAxrcHPPKJc"
+    # --- SECURELY getting the API key from Render's environment variables ---
+    api_key = os.getenv("GEMINI_API_KEY") 
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY environment variable not set.")
     
     genai.configure(api_key=api_key)
-    # Using the 1.5 flash model as requested
-    model = genai.GenerativeModel(model_name='gemini-1.5-flash-latest')
+    # Using the gemini-pro model for stability
+    model = genai.GenerativeModel(model_name='gemini-pro')
     print("Gemini model initialized successfully.")
 except Exception as e:
     print(f"FATAL: Error initializing Gemini: {e}")
@@ -169,10 +170,8 @@ def chat():
 
     if cmd_lower in memory.local_knowledge:
         response_text = memory.local_knowledge[cmd_lower]
-        if response_text == "get_time":
-            response_text = f"The time is {datetime.datetime.now().strftime('%I:%M %p')}."
-        elif response_text == "get_date":
-            response_text = f"Today is {datetime.datetime.now().strftime('%B %d, %Y')}."
+        if response_text == "get_time": response_text = f"The time is {datetime.datetime.now().strftime('%I:%M %p')}."
+        elif response_text == "get_date": response_text = f"Today is {datetime.datetime.now().strftime('%B %d, %Y')}."
     elif cmd_lower in memory.qa_cache:
         response_text = memory.qa_cache[cmd_lower]
 
@@ -186,13 +185,26 @@ def chat():
     
     if response_text is None:
         if not model:
-            print("DEBUG: AI model is NOT initialized.")
             response_text = "The AI model is not initialized. Please check the server logs."
         else:
             try:
                 messages = memory.get_context(user_command)
-                response = model.generate_content(messages)
-                response_text = response.text.strip()
+                # --- ADDED SAFETY SETTINGS to prevent harmful content and handle blocks ---
+                response = model.generate_content(
+                    messages,
+                    safety_settings={
+                        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                    }
+                )
+                
+                # Check if the response was blocked
+                if response.prompt_feedback.block_reason:
+                    response_text = "I'm sorry, I can't respond to that. It violates my safety policies."
+                else:
+                    response_text = response.text.strip()
             except Exception as e:
                 print(f"ERROR: Error communicating with Gemini API: {e}") 
                 response_text = "I'm sorry, I encountered an error with the AI."
