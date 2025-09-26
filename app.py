@@ -52,7 +52,6 @@ class Memory:
                 json.dump(self.conversation_history, f, indent=2, ensure_ascii=False)
             with open(self.facts_file, "w", encoding="utf-8") as f:
                 json.dump(self.facts, f, indent=2, ensure_ascii=False)
-            # Also persist local knowledge and biography (useful)
             with open(self.knowledge_file, "w", encoding="utf-8") as f:
                 json.dump(self.local_knowledge, f, indent=2, ensure_ascii=False)
             with open(self.biography_file, "w", encoding="utf-8") as f:
@@ -62,62 +61,48 @@ class Memory:
 
     def add_to_history(self, role, content):
         """
-        role: 'user' or 'model' (any string is allowed)
+        role: 'user' or 'model'
         content: text content
         """
         if content is None:
             content = ""
+        if role == "assistant":  # normalize invalid role
+            role = "model"
         entry = {"role": role, "content": content}
         self.conversation_history.append(entry)
 
-        # Update the live QA cache when a new model response is generated
+        # Update QA cache for repeated questions
         if role == "model" and len(self.conversation_history) > 1:
             prev = self.conversation_history[-2]
             if prev.get("role") == "user":
                 user_question = prev.get("content", "").strip().lower()
                 if user_question:
-                    # store the mapping question -> latest model answer
                     self.qa_cache[user_question] = content
 
-        # persist
         self.save()
 
     def _build_unified_knowledge(self):
-        """
-        Build a list of human-readable knowledge snippets from facts, biography, and local knowledge
-        """
         knowledge = []
         for key, value in self.facts.items():
             knowledge.append(f"A known fact about '{key}' is '{value}'.")
-
-        # include local knowledge entries
         for key, value in self.local_knowledge.items():
             knowledge.append(f"Local knowledge: when asked '{key}', Jarvis should reply '{value}'.")
-
-        # flatten biography recursively
         self._flatten_biography(self.biography, "biography", knowledge)
         print(f"Built unified knowledge base with {len(knowledge)} items.")
         return knowledge
 
-    # --- FIXED CODE: ADD THIS METHOD ---
     def _build_qa_cache(self):
-        """
-        Builds a question-answer cache from the conversation history
-        to provide instant answers to repeated questions.
-        """
         cache = {}
-        # Iterate through the history to find consecutive user-model pairs
         for i in range(len(self.conversation_history) - 1):
             current_message = self.conversation_history[i]
             next_message = self.conversation_history[i + 1]
-            if current_message.get("role") == "user" and next_message.get("role") == "model":
+            if current_message.get("role") == "user" and next_message.get("role") in ["model", "assistant"]:
                 question = current_message.get("content", "").strip().lower()
                 answer = next_message.get("content", "")
                 if question:
                     cache[question] = answer
         print(f"Built QA cache with {len(cache)} items.")
         return cache
-    # ------------------------------------
 
     def _flatten_biography(self, data, path, knowledge_list):
         if isinstance(data, dict):
@@ -130,17 +115,11 @@ class Memory:
             knowledge_list.append(f"The value for '{path}' is '{data}'.")
 
     def find_relevant_knowledge(self, query, top_k=3):
-        """
-        Very simple keyword intersection-based retrieval from unified_knowledge.
-        Returns top_k snippets.
-        """
         if not query or not isinstance(query, str):
             return []
-
         query_words = set([w.strip() for w in query.lower().split() if w.strip()])
         if not query_words:
             return []
-
         scored_knowledge = []
         for snippet in self.unified_knowledge:
             snippet_words = set([w.strip() for w in snippet.lower().split() if w.strip()])
@@ -148,15 +127,10 @@ class Memory:
             if common_words:
                 score = len(common_words)
                 scored_knowledge.append((score, snippet))
-
         scored_knowledge.sort(key=lambda x: x[0], reverse=True)
         return [snippet for score, snippet in scored_knowledge[:top_k]]
 
     def get_context(self, current_command):
-        """
-        Return a messages-like structure that the Gemini client code in your app expects.
-        We include a system-style prompt followed by recent conversation history.
-        """
         relevant_knowledge = self.find_relevant_knowledge(current_command)
         knowledge_context = "\n".join(relevant_knowledge) if relevant_knowledge else "No specific context found in memory."
 
@@ -167,11 +141,12 @@ class Memory:
             f"--- Relevant Context ---\n{knowledge_context}\n--------------------"
         )
 
-        # Build messages from last few history items
         messages = []
         for item in self.conversation_history[-6:]:
-            # keep the same shape you used before: role + parts
-            messages.append({"role": item.get("role"), "parts": [item.get("content", "")]})
+            role = item.get("role")
+            if role == "assistant":  # normalize invalid role
+                role = "model"
+            messages.append({"role": role, "parts": [item.get("content", "")]})
 
         final_context = [
             {"role": "user", "parts": [system_prompt]},
@@ -191,8 +166,6 @@ try:
     if not api_key:
         raise ValueError("GEMINI_API_KEY environment variable not set.")
     genai.configure(api_key=api_key)
-    # Keep this line as you had it; if your installed google.generativeai uses a slightly different API,
-    # replace with the appropriate constructor. We guard against runtime failure.
     model = genai.GenerativeModel(model_name="gemini-pro-latest")
     print("Gemini model initialized successfully.")
 except Exception as e:
@@ -238,23 +211,19 @@ def chat():
     if not user_command:
         return jsonify({"reply": "I didn't receive a command."})
 
-    # store user message
     memory.add_to_history("user", user_command)
     cmd_lower = user_command.strip().lower()
     response_text = None
 
-    # Exact-match local knowledge
     if cmd_lower in memory.local_knowledge:
         response_text = memory.local_knowledge[cmd_lower]
         if response_text == "get_time":
             response_text = f"The time is {datetime.datetime.now().strftime('%I:%M %p')}."
         elif response_text == "get_date":
             response_text = f"Today is {datetime.datetime.now().strftime('%B %d, %Y')}."
-    # QA cache (previously answered question)
     elif cmd_lower in memory.qa_cache:
         response_text = memory.qa_cache[cmd_lower]
 
-    # Simple command parsing
     if response_text is None:
         if "weather" in cmd_lower:
             response_text = fetch_weather()
@@ -266,7 +235,6 @@ def chat():
             else:
                 response_text = "Please provide a search query."
 
-    # Fall back to the Gemini model if still no response
     if response_text is None:
         if not model:
             print("DEBUG: AI model is NOT initialized.")
@@ -275,14 +243,8 @@ def chat():
             try:
                 messages = memory.get_context(user_command)
                 print(f"DEBUG: Messages sent to Gemini: {messages}")
-                # NOTE: the exact call below depends on the version of google.generativeai you have.
-                # You used model.generate_content(messages) previously. If your library supports
-                # `model.generate_content(...)` that will work. If not, replace with the
-                # appropriate call (e.g. genai.generate(...), model.generate(...), etc.)
                 response = model.generate_content(messages)
-                # Some wrappers return a `.text` or `.result` field; we guard against common shapes:
                 response_text = getattr(response, "text", None) or getattr(response, "result", None) or str(response)
-                # If response_text is an object/dict, try to coerce to string:
                 if isinstance(response_text, (dict, list)):
                     response_text = json.dumps(response_text, ensure_ascii=False)
                 response_text = str(response_text).strip()
@@ -291,13 +253,10 @@ def chat():
                 print(f"ERROR: Error communicating with Gemini API: {e}")
                 response_text = "I'm sorry, I encountered an error with the AI."
 
-    # store model response
     memory.add_to_history("model", response_text)
-
     return jsonify({"reply": response_text})
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    # For production you should use a production WSGI server (gunicorn/uvicorn) not Flask's built-in server
     app.run(host="0.0.0.0", port=port)
