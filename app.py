@@ -5,11 +5,10 @@ import json
 import datetime
 import geocoder
 import requests
-from urllib.parse import quote_plus # <--- FIX 1: Added the missing import
+from urllib.parse import quote_plus
 
 # --- MEMORY CLASS (Upgraded with RAG) ---
 class Memory:
-    # --- FIX 2: Removed all non-printable characters (U+00A0) from the entire file ---
     def __init__(self, memory_file="jarvis_memory.json", facts_file="jarvis_facts.json", knowledge_file="local_knowledge.json", biography_file="jarvis_biography.json"):
         self.memory_file = memory_file
         self.facts_file = facts_file
@@ -122,13 +121,14 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 memory = Memory()
 
 # --- Gemini Model Initialization ---
-# --- IMPORTANT SECURITY FIX ---
-# It is not safe to paste your API key here. Use environment variables instead.
 try:
-    api_key = os.getenv("AIzaSyAlkj9S951Jz4hcvJxTN9w9-LXwacVBlgI") # This is the secure way
+    # --- THIS IS THE FIX ---
+    # Use the VARIABLE NAME "GEMINI_API_KEY" inside getenv()
+    api_key = os.getenv("GEMINI_API_KEY") 
     if not api_key:
         raise ValueError("GEMINI_API_KEY environment variable not set.")
     genai.configure(api_key=api_key)
+    # Using the 1.5 flash model as requested
     model = genai.GenerativeModel(model_name='gemini-1.5-flash-latest')
     print("Gemini model initialized successfully.")
 except Exception as e:
@@ -139,7 +139,6 @@ except Exception as e:
 def fetch_weather():
     location = geocoder.ip("me").latlng
     if location:
-        # Also get the weather key from environment variables
         api_key = os.getenv("WEATHER_API_KEY")
         if not api_key:
             return "Sorry, the weather service is not configured."
@@ -193,12 +192,10 @@ def chat():
         else:
             try:
                 messages = memory.get_context(user_command)
-                print(f"DEBUG: Messages sent to Gemini: {messages}")
                 response = model.generate_content(messages)
                 response_text = response.text.strip()
-                print(f"DEBUG: Gemini response received: {response_text}")
             except Exception as e:
-                print(f"ERROR: Error communicating with Gemini API: {e}")
+                print(f"ERROR: Error communicating with Gemini API: {e}") 
                 response_text = "I'm sorry, I encountered an error with the AI."
     
     memory.add_to_history("model", response_text)
