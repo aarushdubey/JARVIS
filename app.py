@@ -125,7 +125,7 @@ memory = Memory()
 # --- IMPORTANT SECURITY FIX ---
 # It is not safe to paste your API key here. Use environment variables instead.
 try:
-    api_key = os.getenv("GEMINI_API_KEY") # This is the secure way
+    api_key = os.getenv("AIzaSyAlkj9S951Jz4hcvJxTN9w9-LXwacVBlgI") # This is the secure way
     if not api_key:
         raise ValueError("GEMINI_API_KEY environment variable not set.")
     genai.configure(api_key=api_key)
