@@ -122,12 +122,13 @@ memory = Memory()
 
 # --- Gemini Model Initialization ---
 try:
-    api_key = os.getenv("GEMINI_API_KEY") 
-    if not api_key:
-        raise ValueError("GEMINI_API_KEY environment variable not set.")
+    # --- API KEY IS NOW HARD-CODED AS REQUESTED ---
+    # WARNING: This is insecure. Avoid putting secret keys in your code.
+    api_key = "AIzaSyACX3zMiPVbKlhkNxDhNTkoaAxrcHPPKJc"
+    
     genai.configure(api_key=api_key)
-    # --- MODEL CHANGED TO A UNIVERSAL, STABLE VERSION ---
-    model = genai.GenerativeModel(model_name='gemini-pro')
+    # Using the 1.5 flash model as requested
+    model = genai.GenerativeModel(model_name='gemini-1.5-flash-latest')
     print("Gemini model initialized successfully.")
 except Exception as e:
     print(f"FATAL: Error initializing Gemini: {e}")
