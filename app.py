@@ -1,3 +1,4 @@
+from urllib.parse import quote_plus
 from flask import Flask, request, jsonify, render_template
 import google.generativeai as genai
 import os
@@ -128,11 +129,11 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 memory = Memory()
 
 # --- Gemini Model Initialization ---
+# --- Gemini Model Initialization ---
 try:
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise ValueError("GEMINI_API_KEY environment variable not set.")
-    genai.configure(api_key=api_key)
+    # Directly paste your API key here
+    api_key = "AIzaSyDxKP-O2IujWW7NCS0Qzf5og0xyUB6cqd8" 
+    genai.configure(api_key=api_key)
     model = genai.GenerativeModel(model_name='gemini-1.5-flash-latest')
     print("Gemini model initialized successfully.")
 except Exception as e:
