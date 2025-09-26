@@ -122,14 +122,12 @@ memory = Memory()
 
 # --- Gemini Model Initialization ---
 try:
-    # --- THIS IS THE FIX ---
-    # Use the VARIABLE NAME "GEMINI_API_KEY" inside getenv()
     api_key = os.getenv("GEMINI_API_KEY") 
     if not api_key:
         raise ValueError("GEMINI_API_KEY environment variable not set.")
     genai.configure(api_key=api_key)
-    # Using the 1.5 flash model as requested
-    model = genai.GenerativeModel(model_name='gemini-1.5-flash-latest')
+    # --- MODEL CHANGED TO A UNIVERSAL, STABLE VERSION ---
+    model = genai.GenerativeModel(model_name='gemini-pro')
     print("Gemini model initialized successfully.")
 except Exception as e:
     print(f"FATAL: Error initializing Gemini: {e}")
